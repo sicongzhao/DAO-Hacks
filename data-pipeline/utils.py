@@ -10,13 +10,13 @@ covalent_key = 'ckey_1c9890fa556c457ab9ff050c2f4'
 
 ens_token_addr = '0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72' # for testing purpose
 
-latest_block = 14548652
+latest_block = 14555320
 max_r_blocks = 1000000
 
-df = pd.read_csv('../data/dao-data.csv')
+daoinfo = pd.read_csv('../data/daoinfo.csv')
 votes = pd.read_csv('../data/snapshot_votes.csv')
 proposals = pd.read_csv('../data/snapshot_proposals.csv')
-members = pd.read_csv('../data/members.csv')
+members = pd.read_csv('../data/members_summary.csv')
 
 
 
@@ -33,6 +33,7 @@ query ($first:Int!, $skip:Int!, $space_in:[String]!) {
     orderDirection: desc
   ) {
     id
+    type
     title
     body
     choices
@@ -147,7 +148,7 @@ def gini(array):
     # Gini coefficient:
     return ((np.sum((2 * index - n  - 1) * array)) / (n * np.sum(array)))
 
-def reject_outliers(data, m=100.):
+def remove_outliers_by_std(data, m=10.):
     """Remove outliers"""
     data = np.array(data)
     d = np.abs(data - np.median(data))
@@ -157,3 +158,54 @@ def reject_outliers(data, m=100.):
 
 def isNaN(num):
     return num != num
+
+def remove_outliers_by_rank(data, u=10, l=10):
+    if len(data < u + l):
+        return data
+    else:
+        data = np.array(data)
+        for i in range(u):
+            data = np.delete(data, data.argmax())
+        for i in range(l):
+            data = np.delete(data, data.argmin())
+        return data
+
+def calc_poll_detail_stats(proposal_res, token_address, block_height):
+    num_of_choices = proposal_res.shape[0]
+    voter_lists = proposal_res['voter_list'].values
+    
+    r = r_token_holder_url(1, token_address, 100000, 0, block_height)
+    poll_historical_balance = {}
+    for i in r['data']['items']:
+        poll_historical_balance[i['address']] = int(i['balance'])
+
+    poll_stats = []
+    prev_max_balance = 0
+    win_choice_id = -1
+    total_token = 0
+    for j in range(len(voter_lists)):
+        temp = {
+            'voters': len(voter_lists[j]),
+            'tokens': 0
+        }
+        for a in voter_lists[j]:
+            if a.lower() in poll_historical_balance.keys():
+                temp['tokens'] += poll_historical_balance[a.lower()]
+                total_token += poll_historical_balance[a.lower()]
+                if temp['tokens'] > prev_max_balance:
+                    win_choice_id = j
+                    prev_max_balance = temp['tokens']
+        poll_stats.append(temp)
+    
+    winner = poll_stats[win_choice_id]
+    
+    
+    if total_token > 0 and winner['voters'] > 0 and total_votes > 0:
+        token_rate = winner['tokens']/total_token
+        voter_rate = winner['voters']/total_votes
+        agreement_coefficient = token_rate/voter_rate
+    else:
+        agreement_coefficient = math.nan
+        token_rate = math.nan
+        voter_rate = math.nan
+    return token_rate, voter_rate, agreement_coefficient

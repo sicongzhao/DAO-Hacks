@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-100 min-h-screen max-h-screen overflow-y-auto">
+  <div class="min-h-screen max-h-screen overflow-y-auto">
     <div class="flex-col max-w-7xl mx-auto bg-white">
       <div id="header" class="flex justify-between content-center items-center py-6">
         <router-link to="/">

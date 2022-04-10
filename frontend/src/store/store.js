@@ -7,12 +7,16 @@ const store = createStore({
   state:{
     account: null,
     error: null,
-    DAOInfo: []
+    DAOInfo: [],
+    DAOPageData: [],
+    DAOIndex: null,
   },
   getters: {
     account: (state) => state.account,
     error: (state) => state.error,
     DAOInfo: (state) => state.DAOInfo,
+    DAOIndex: (state) => state.DAOIndex,
+    DAOPageData: (state) => state.DAOPageData,
   },
   mutations: {
     setAccount(state, account) {
@@ -23,7 +27,13 @@ const store = createStore({
     },
     setDAOInfo(state, DAOInfo) {
       state.DAOInfo = DAOInfo
-   },
+    },
+    setDAOPageData(state, DAOPageData) {
+      state.DAOPageData = DAOPageData
+    },
+    setDAOIndex(state, DAOIndex) {
+      state.DAOIndex = DAOIndex
+    },
   },
   actions: {
     async connect({commit, dispatch}, connect) {
@@ -95,6 +105,10 @@ const store = createStore({
         commit("setDAOInfo", data.data) 
       });
     },
+
+    async updateDAOIndex({commit},DAOIndex){
+      commit("setDAOIndex", DAOIndex) 
+    }
   }
 })
 
