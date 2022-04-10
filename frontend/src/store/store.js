@@ -6,11 +6,13 @@ import { createStore } from "vuex"
 const store = createStore({
   state:{
     account: null,
-    error: null
+    error: null,
+    DAOInfo: []
   },
   getters: {
     account: (state) => state.account,
-    error: (state) => state.error
+    error: (state) => state.error,
+    DAOInfo: (state) => state.DAOInfo,
   },
   mutations: {
     setAccount(state, account) {
@@ -18,7 +20,10 @@ const store = createStore({
     },
     setError(state, error) {
        state.error = error
-    }
+    },
+    setDAOInfo(state, DAOInfo) {
+      state.DAOInfo = DAOInfo
+   },
   },
   actions: {
     async connect({commit, dispatch}, connect) {
@@ -79,7 +84,17 @@ const store = createStore({
         method: 'eth_requestAccounts'
       })
       commit('setAccount', accounts[0])
-    }
+    },
+
+    async getDAOInfo({commit}) {
+      let url = 'https://ru355oakp6.execute-api.us-west-2.amazonaws.com/default/daohack-daoinfo'
+      await fetch(url).then(function(response) {
+        return response.json()
+      }).then(function(data) {
+        console.log(data)
+        commit("setDAOInfo", data.data) 
+      });
+    },
   }
 })
 
