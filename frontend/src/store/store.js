@@ -102,7 +102,14 @@ const store = createStore({
         return response.json()
       }).then(function(data) {
         console.log(data)
-        commit("setDAOInfo", data.data) 
+        let daoinfo = []
+        data.data.forEach(ele => {
+          if (ele['total_holders']!='') {
+            daoinfo.push(ele)
+          }
+          
+        });
+        commit("setDAOInfo", daoinfo) 
       });
     },
 
