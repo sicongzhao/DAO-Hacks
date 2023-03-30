@@ -6,7 +6,7 @@ import math
 
 snapshot_api = 'https://hub.snapshot.org/graphql'
 covalent_api = 'https://api.covalenthq.com/v1/'
-covalent_key = 'ckey_1c9890fa556c457ab9ff050c2f4'
+covalent_key = <you-key>
 
 ens_token_addr = '0xC18360217D8F7Ab5e7c516566761Ea12Ce7F9D72' # for testing purpose
 
